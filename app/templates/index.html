@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Hello World</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</head>
+<body>
+    <div class="column-container">
+        <div class="column-left">
+            <p class="wide-letters">C L I E N T E</p>
+            <p class="hora" id="myport">p</p>
+            <p class="hora" id="currlead">v</p>
+            <p class="hora" id="amilid">a</p>
+        </div>
+        <div class="column-right">
+            <div class="log-console">
+                <p class="console-text">$ c l i e n t _ l o g > _</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+body {
+    background-color: #121212;
+    color: #fff;
+}
+
+.column-container {
+    display: flex;
+}
+
+.column-left {
+    flex: 0 0 60%;
+}
+
+.column-right {
+    flex: 0 0 40%;
+}
+
+.wide-letters {
+    font-family: 'Roboto Mono', monospace;
+    text-shadow: 0 0 10px rgb(17, 255, 0), 0 0 20px rgb(0, 101, 0), 0 0 40px rgb(0, 70, 0), 0 0 80px rgb(0, 50, 0), 0 0 120px rgb(0, 35, 0), 0 0 150px rgb(0, 20, 0);
+    font-size: 30px;
+    margin-top: 50px;
+    letter-spacing: 3.2vw; /* Espaciado entre letras de 0.5em */
+    text-align: center; /* Justificar el texto para llenar el espacio */
+}
+
+.hora {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 50px;
+    text-shadow: 0 0 10px rgb(13, 195, 0), 0 0 20px rgb(0, 101, 0), 0 0 40px rgb(0, 70, 0), 0 0 80px rgb(0, 50, 0), 0 0 120px rgb(0, 35, 0);
+    margin-top: 10vh;
+    margin-bottom: 0px;
+    letter-spacing: 0.8vw;
+    text-align: center;
+}
+
+.time-label {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 20px;
+    margin-top: 1px;
+    letter-spacing: 0.8vw;
+    text-align: center;
+}
+
+.log-bottom-text {
+    margin-top: auto;
+    margin-bottom: 0px;
+    font-size: 20px;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.log-console {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 48px;
+    height: 87vh;
+    max-height: 88vh;
+    overflow-y: auto;
+    width: 35vw;
+    box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5), 0 0 30px rgb(0, 0, 0), 0 0 0 1px white; /* Sombra verde, sombra exterior negra y borde blanco */
+    background-color: #000000;
+}
+
+.console-text {
+    margin-bottom: 0px;
+    font-size: 18px;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.log-console::-webkit-scrollbar {
+    display: none; /* Ocultar la barra de desplazamiento en WebKit (Chrome, Safari, etc.) */
+}
