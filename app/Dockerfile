@@ -8,7 +8,7 @@ WORKDIR /
 COPY . .
 
 # Instalamos las dependencias del proyecto
-RUN pip install --no-cache-dir Flask Flask-SocketIO pytz
+RUN pip install --no-cache-dir Flask Flask-SocketIO requests
 
 
 # Exponemos el puerto 5000 para que Flask pueda escuchar las solicitudes

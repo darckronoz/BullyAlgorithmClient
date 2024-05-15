@@ -18,6 +18,7 @@ my_id = None
 health_check_scheduler = None
 selecting_leader  = False
 enabled = True
+health_check_thread = None
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -33,11 +34,6 @@ def healthcheck():
 @app.route('/weight', methods=['GET'])
 def get_weight():
     return str(my_id), 200
-
-def init_health_check():
-    health_check_thread = threading.Thread(target=check_leader_health, args=(BASE_URL,))
-    health_check_thread.daemon = True
-    health_check_thread.start()
 
 def select_new_leader(): 
     global current_leader, my_port, known_ports, possible_leader, selecting_leader
@@ -87,6 +83,7 @@ def get_node_id(url):
 
 def check_leader_health(url):
     while True:
+        print("hilo iniciado")
         if not my_port==current_leader and not selecting_leader:
             try:
                 response = requests.get(url+current_leader+"/healthcheck")
@@ -106,6 +103,10 @@ def test_connect():
 @socketio.on('start_stream')
 def start_stream():
     print('Starting stream')
+    print("starting thread")
+    health_check_thread = threading.Thread(target=check_leader_health, args=(BASE_URL,))
+    health_check_thread.daemon = True
+    health_check_thread.start()
     while True:
         socketio.emit('myport', str(my_port))
         if my_port==current_leader:
@@ -127,6 +128,7 @@ def validate_numeric(value):
         return False
 
 def assign_env_variables():
+    print("inciando asignación de variables")
     global my_port, my_id, known_ports, current_leader
 
     my_port = "5000"#os.getenv('MY_PORT')
@@ -143,8 +145,8 @@ def assign_env_variables():
 
     if len(known_ports) <= 1:
         current_leader = my_port
+    print("terminando asignación de variables")
 
 if __name__ == '__main__':
     assign_env_variables()
-    init_health_check()
     socketio.run(app)

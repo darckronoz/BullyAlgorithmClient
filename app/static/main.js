@@ -2,6 +2,7 @@ var socket = io();
 
 socket.on('connect', function () {
     console.log('Connected');
+    socket.emit('start_stream');
 });
 
 socket.on('log', function(data) {
