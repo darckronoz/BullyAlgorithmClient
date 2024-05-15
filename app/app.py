@@ -9,7 +9,7 @@ import threading
 import requests
 
 BASE_URL = "localhost"
-MONITOR_PORT = ""
+MONITOR_PORT = "8999"
 
 known_ports = []
 current_leader = None
@@ -71,6 +71,28 @@ def update_leadstatus():
     if not response.status_code == 200:
         sendlog("Error al enviar mensaje al monitor. ", target_url)
 
+@app.route('/currentlead', methods=['GET'])
+def get_current_lead():
+    return str(current_leader), 200
+
+#Preguntar a todos los nodos de la lista quien es el lider.
+def askfor_current_lead():
+    print("eligiendo lider de la lista")
+    global current_leader
+    for port in known_ports:
+        try:
+            response = requests.get(BASE_URL+port+"/currentlead")
+            if response.status_code == 200:
+                current_leader = response
+                return
+            else:
+                pass
+        except:
+            pass
+    print("ningun nodo dio respueta asignandome a mi como lider.")
+    current_leader = my_port
+    return
+
 def get_node_id(url):
     try:
         id = -1
@@ -83,7 +105,6 @@ def get_node_id(url):
 
 def check_leader_health(url):
     while True:
-        print("hilo iniciado")
         if not my_port==current_leader and not selecting_leader:
             try:
                 response = requests.get(url+current_leader+"/healthcheck")
@@ -109,7 +130,7 @@ def start_stream():
     health_check_thread.start()
     while True:
         socketio.emit('myport', str(my_port))
-        if my_port==current_leader:
+        if not my_port==current_leader:
             socketio.emit('amilead', 'no soy 😞')
         else:
             socketio.emit('amilead', 'si soy 👑')
@@ -131,9 +152,9 @@ def assign_env_variables():
     print("inciando asignación de variables")
     global my_port, my_id, known_ports, current_leader
 
-    my_port = "5000"#os.getenv('MY_PORT')
-    my_weight = "2"#os.getenv('MY_WEIGHT')
-    known_ports_str = "5000"#os.getenv('KNOWN_PORTS')
+    my_port = os.getenv('MY_PORT')
+    my_weight = os.getenv('MY_WEIGHT')
+    known_ports_str = os.getenv('KNOWN_PORTS')
 
     if not all(map(validate_numeric, [my_port, my_weight])):
         print("Los valores de las variables de entorno deben ser numéricos.")
@@ -145,6 +166,8 @@ def assign_env_variables():
 
     if len(known_ports) <= 1:
         current_leader = my_port
+    else:
+        select_new_leader()
     print("terminando asignación de variables")
 
 if __name__ == '__main__':
