@@ -10,9 +10,8 @@ COPY . .
 # Instalamos las dependencias del proyecto
 RUN pip install --no-cache-dir Flask Flask-SocketIO requests
 
-
 # Exponemos el puerto 5000 para que Flask pueda escuchar las solicitudes
 EXPOSE 5000
 
 # Comando para ejecutar la aplicación Flask
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["python", "app.py", "--host=0.0.0.0"]

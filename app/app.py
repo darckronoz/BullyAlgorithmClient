@@ -8,7 +8,7 @@ import random
 import threading
 import requests
 
-BASE_URL = "localhost"
+BASE_URL = "10.4.73.251"
 MONITOR_PORT = "8999"
 
 known_ports = []
@@ -16,7 +16,7 @@ current_leader = None
 my_port = None
 my_id = None
 health_check_scheduler = None
-selecting_leader  = False
+selecting_leader = False
 enabled = True
 health_check_thread = None
 
@@ -75,7 +75,6 @@ def update_leadstatus():
 def get_current_lead():
     return str(current_leader), 200
 
-#Preguntar a todos los nodos de la lista quien es el lider.
 def askfor_current_lead():
     print("eligiendo lider de la lista")
     global current_leader
@@ -105,7 +104,7 @@ def get_node_id(url):
 
 def check_leader_health(url):
     while True:
-        if not my_port==current_leader and not selecting_leader:
+        if not my_port == current_leader and not selecting_leader:
             try:
                 response = requests.get(url+current_leader+"/healthcheck")
                 if not response.status_code == 200:
@@ -130,7 +129,7 @@ def start_stream():
     health_check_thread.start()
     while True:
         socketio.emit('myport', str(my_port))
-        if not my_port==current_leader:
+        if not my_port == current_leader:
             socketio.emit('amilead', 'no soy 😞')
         else:
             socketio.emit('amilead', 'si soy 👑')
@@ -152,9 +151,13 @@ def assign_env_variables():
     print("inciando asignación de variables")
     global my_port, my_id, known_ports, current_leader
 
-    my_port = os.getenv('MY_PORT')
-    my_weight = os.getenv('MY_WEIGHT')
-    known_ports_str = os.getenv('KNOWN_PORTS')
+    my_port = str(os.getenv('MY_PORT'))
+    my_weight = str(os.getenv('SERVER_ID'))
+    known_ports_str = str(os.getenv('KNOWN_PORTS'))
+
+    print(my_port)
+    print(my_weight)
+    print(known_ports_str)
 
     if not all(map(validate_numeric, [my_port, my_weight])):
         print("Los valores de las variables de entorno deben ser numéricos.")
@@ -172,4 +175,4 @@ def assign_env_variables():
 
 if __name__ == '__main__':
     assign_env_variables()
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', allow_unsafe_werkzeug=True)
