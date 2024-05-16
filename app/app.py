@@ -8,7 +8,7 @@ import random
 import threading
 import requests
 
-BASE_URL = "10.4.73.251"
+BASE_URL = "http://10.4.73.251"
 MONITOR_PORT = "8999"
 
 known_ports = []
@@ -136,9 +136,12 @@ def start_stream():
         socketio.emit('whoslead', 'El lider es '+str(current_leader)+'')
         time.sleep(1)
 
-def sendlog(msg, ip):
+def sendlog(msg, ip=None):
     thetime = datetime.now()
-    socketio.emit('log', '['+ thetime.strftime('%m/%d/%y %H:%M:%S') + '] ' + msg + ' ip: ' + ip)
+    if ip:
+        socketio.emit('log', '['+ thetime.strftime('%m/%d/%y %H:%M:%S') + '] ' + msg + ' ip: ' + ip)
+    else:
+        socketio.emit('log', '['+ thetime.strftime('%m/%d/%y %H:%M:%S') + '] ' + msg)
     
 def validate_numeric(value):
     try:
