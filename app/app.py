@@ -39,24 +39,28 @@ def select_new_leader():
     global current_leader, my_port, known_ports, possible_leader, selecting_leader
     possible_leader = my_port
     selecting_leader = True
-    sendlog("seleccionando nuevo lider", "")
+    sendlog("seleccionando nuevo lider")
     for port in known_ports:
         sendlog(f"analizando puerto {port}", "")
         if port != current_leader:
             node_id = get_node_id(BASE_URL+f":{port}/weight")
-            sendlog(f"en puerto {port}, se obtuvo el id: {node_id}", "")
+            sendlog(f"en puerto {port}, se obtuvo el id: {node_id}")
             if node_id > my_id:
-                sendlog(f"el id: {node_id} es mayor a mi id: {my_id}, posible lider: {port}", "")
+                sendlog(f"el id: {node_id} es mayor a mi id: {my_id}, posible lider: {port}")
                 possible_leader = port
-            current_leader = possible_leader
-            if current_leader == my_port:
-                update_leadstatus()
-                sendlog("soy el nuevo lider :D")
-            else:
-                sendlog(f"nuevo lider: {port}")
-            selecting_leader = False
         else:
             sendlog(f"{port} es el lider caido, pasando al siguiente puerto", "")
+
+    sendlog("currentleader = " + str(current_leader))
+    sendlog("possible_leader = " + str(possible_leader))
+    current_leader = possible_leader
+    if current_leader == my_port:
+        update_leadstatus()
+        sendlog("soy el nuevo lider :D")
+    else:
+        sendlog(f"nuevo lider: {port}")
+    selecting_leader = False
+        
 
 def update_leadstatus():
     global my_port    
@@ -80,9 +84,13 @@ def askfor_current_lead():
     global current_leader
     for port in known_ports:
         try:
-            response = requests.get(BASE_URL+port+"/currentlead")
+            print("preguntando :" + str(port))
+            print(BASE_URL+":"+str(port)+"/currentlead")
+            response = requests.get(BASE_URL+f":{port}/currentlead")
+            print("response; ")
+            print(response)
             if response.status_code == 200:
-                current_leader = response
+                current_leader = int(response.text)
                 return
             else:
                 pass
@@ -105,12 +113,14 @@ def get_node_id(url):
 def check_leader_health(url):
     while True:
         if not my_port == current_leader and not selecting_leader:
+            sendlog("revisando el estado del lider")
             try:
-                response = requests.get(url+current_leader+"/healthcheck")
+                response = requests.get(url+str(current_leader)+"/healthcheck")
                 if not response.status_code == 200:
                     sendlog(f"Health check failed at {url}. Status code: {response.status_code}", url)
                     select_new_leader()
             except requests.exceptions.RequestException as e:
+                select_new_leader()
                 sendlog(f"Health check failed at {url}. Error: {e}", url)
                 print(f"Health check failed at {url}. Error: {e}")
             
@@ -140,8 +150,10 @@ def sendlog(msg, ip=None):
     thetime = datetime.now()
     if ip:
         socketio.emit('log', '['+ thetime.strftime('%m/%d/%y %H:%M:%S') + '] ' + msg + ' ip: ' + ip)
+        print('['+ thetime.strftime('%m/%d/%y %H:%M:%S') + '] ' + msg + ' ip: ' + ip)
     else:
         socketio.emit('log', '['+ thetime.strftime('%m/%d/%y %H:%M:%S') + '] ' + msg)
+        print('['+ thetime.strftime('%m/%d/%y %H:%M:%S') + '] ' + msg)
     
 def validate_numeric(value):
     try:
@@ -172,8 +184,9 @@ def assign_env_variables():
 
     if len(known_ports) <= 1:
         current_leader = my_port
+        update_leadstatus()
     else:
-        select_new_leader()
+        askfor_current_lead()
     print("terminando asignación de variables")
 
 if __name__ == '__main__':
